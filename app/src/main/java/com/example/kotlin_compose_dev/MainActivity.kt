@@ -10,42 +10,50 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            GreetingText(name = "하세요")
+            MainScreen()
         }
     }
 }
 
 @Composable
-fun GreetingText(name: String) {
-    Text(
-        text = "안녕 $name!",
-        modifier = Modifier
-            .clickable(onClick = { })
-            .padding(all = 24.dp)
-            .width(200.dp)
-            .height(240.dp),
-        style = MaterialTheme.typography.headlineSmall,
-        fontWeight = FontWeight.SemiBold
-    )
+fun MainScreen() {
+    // Surface는 Jetpack Compose에서 Material Design의 기본적인 배경을 제공하는 컴포저블. 컨테이너의 역할을 한다.
+    Surface(
+        color = Color.DarkGray,
+        modifier = Modifier.fillMaxSize()
+    ) {
+        Surface(
+            color = Color.Magenta,
+            modifier = Modifier.wrapContentSize(
+                align = Alignment.Center
+                // align 의 기본값은 Alignment.Center
+                // align은 자식 컴포저블이 부모 컴포저블 내에서 어떤 위치에 배치될지를 결정한다
+            ) // wrapContentSize는 자식 컴포저블의 크기에 맞게 Surface의 크기를 조정한다
+        ) {
+            Text(
+                text = "Wrapped Content", // Text는 Modifier.wrapContentSize() 를 명시할 필요가 없음
+                style = MaterialTheme.typography.headlineLarge
+            )
+        }
+    }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun ContentPreview() {
-    GreetingText(name = "하세요")
+    MainScreen()
 }
