@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -24,53 +25,48 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
+
+val nameList : ArrayList<String> = arrayListOf(
+    "John", "Michael", "Andrew", "Danna")
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            MainScreen()
+            GreetingList(names = nameList)
         }
     }
 }
 
 @Composable
-fun MainScreen() {
-    Surface(
-        color = Color.DarkGray,
-        modifier = Modifier.fillMaxSize()
+fun GreetingList(names : List<String>) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.SpaceEvenly,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.SpaceEvenly,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Row(
-                // fillMaxWidth()는 Row의 width를 상위 컴포저블의 width만큼 채우도록 함
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-            ) {
-                ColoredSquare(Color.Red)
-                ColoredSquare(Color.Magenta)
-            }
-            ColoredSquare(Color.Cyan)
-            ColoredSquare(Color.Yellow)
-            ColoredSquare(Color.Blue)
+        for(name in names) {
+            Greeting(name = name)
+        }
+
+        // 버튼으로 컨텐츠가 추가되면 recomposition이 일어남
+        // Jetpack Compose가 ui를 업데이트하는 방법
+        Button(onClick = { nameList.add("new name") }) {
+            Text(text = "Add new name")
         }
     }
 }
 
 @Composable
-fun ColoredSquare(color: Color) {
-    Surface(
-        color = color,
-        modifier = Modifier
-            .height(100.dp)
-            .width(100.dp)
-    ) { }
+fun Greeting(name: String) {
+    Text(
+        text = "Hello $name!",
+        style = MaterialTheme.typography.bodyMedium
+    )
 }
 
 @Preview(showBackground = true)
 @Composable
 fun ContentPreview() {
-    MainScreen()
+    GreetingList(names = nameList)
 }
