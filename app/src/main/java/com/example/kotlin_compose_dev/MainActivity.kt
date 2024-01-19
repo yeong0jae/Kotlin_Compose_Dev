@@ -19,6 +19,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -26,34 +28,40 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 
-val nameList : ArrayList<String> = arrayListOf(
-    "John", "Michael", "Andrew", "Danna")
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            GreetingList(names = nameList)
+            MainScreen()
         }
     }
 }
 
 @Composable
-fun GreetingList(names : List<String>) {
+fun MainScreen() {
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.SpaceEvenly,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        for(name in names) {
-            Greeting(name = name)
-        }
+        GreetingList()
+    }
+}
 
-        // 버튼으로 컨텐츠가 추가되면 recomposition이 일어남
-        // Jetpack Compose가 ui를 업데이트하는 방법
-        Button(onClick = { nameList.add("new name") }) {
-            Text(text = "Add new name")
-        }
+@Composable
+fun GreetingList() {
+    val greetingListState = remember { mutableStateListOf<String>("John", "Amanda") }
+    // snapshotStateList를 반환 -> 변수를 state로 선언하면 값이 변경될 때마다 Composable이 다시 호출된다
+    // remember는 주로 화면이 다시 그려질 때 상태를 유지할 때 사용되며,
+    // mutableStateListOf는 그 상태를 변경하거나 감시하는 데 사용됨
+    for(name in greetingListState) {
+        Greeting(name = name)
+    }
+
+    Button(onClick = { greetingListState.add("Michael") }) {
+        Text(text = "Add new name")
     }
 }
 
@@ -68,5 +76,5 @@ fun Greeting(name: String) {
 @Preview(showBackground = true)
 @Composable
 fun ContentPreview() {
-    GreetingList(names = nameList)
+    MainScreen()
 }
