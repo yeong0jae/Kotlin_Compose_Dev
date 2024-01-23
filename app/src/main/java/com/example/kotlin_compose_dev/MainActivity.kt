@@ -21,6 +21,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,46 +42,36 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun MainScreen() {
-    // state를 상위 컴포저블에서 관리
-    val greetingListState = remember {
-        mutableStateListOf<String>("John", "Amanda")
-    }
+fun MainScreen(viewModel: MainViewModel = MainViewModel()) {
+// 매개변수에 기본값을 지정. MainScreen()을 호출할 때 기본값으로 MainViewModel()이 사용됨
+    //*****현재 textField가 변하지 않는 이유는 MainScreen이 Recompose되고 그에 따라 MainViewModel이 다시 생성되기 때문이다*****//
 
-    val newNameStateContent = remember { mutableStateOf("") }
+    val newNameStateContent = viewModel.textFieldState.observeAsState("")
+    // observeAsState : MutableLiveData<String> 타입의 State -> State<String> 타입의 State
+    // -> value를 사용하면 LiveData의 현재 값(String)에 액세스 가능
 
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.SpaceEvenly,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        GreetingList(greetingListState, { // 1. state of Text
-            greetingListState.add(newNameStateContent.value) // 2. state update
-        }, newNameStateContent.value, { // 3. state of TextField
-            newName -> newNameStateContent.value = newName // 4. state update
-        })
+        GreetingMessage(newNameStateContent.value) { newName -> // 람다식을 전달
+            viewModel.onTextChanged(newName)
+        }
     }
-    // state hosting을 통해 여러 컴포저블에서 상태를 공유할 수 있는 것임
-    // Text와 TextField가 같은 상태를 공유하고 있음 -> 그래서 textfield에 입력해서 text를 추가하는 것이 되는 거임
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun GreetingList(namesList : List<String>,
-                 buttonClick : () -> Unit,
+fun GreetingMessage(
                  textFieldValue: String,
                  textFieldUpdate: (newName: String) -> Unit
-){ // 람다식을 매개변수로 받음
-    for(name in namesList) {
-        Greeting(name = name)
-    }
+){
 
-    TextField(value = textFieldValue, onValueChange = textFieldUpdate)  // onValueChange는 textfield의 값이 변경될 때마다 호출
-    // List가 아닌 state는 value로 값에 접근해야함. mutableStateList는 List를 상속받기 때문
-    // mutableState는 String을 상속받는 등이 없기 때문에 value로 접근해야함
+    TextField(value = textFieldValue, onValueChange = textFieldUpdate)
 
-    Button(onClick = buttonClick) {
-        Text(text = "Add new name")
+    Button(onClick = {}) {
+        Text(textFieldValue)
     }
 }
 
