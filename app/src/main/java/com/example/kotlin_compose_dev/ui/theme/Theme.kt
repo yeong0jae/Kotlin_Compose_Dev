@@ -16,17 +16,18 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
-private val DarkColorScheme = darkColorScheme(
+private val DarkColorScheme = darkColorScheme( // darkColorScheme은 MaterialTheme의 colorScheme를 설정하는 함수
     primary = Purple80,
     secondary = PurpleGrey80,
-    tertiary = Pink80
+    tertiary = Pink80,
+    surface = veryLightGrey // surface의 color 재정의
 )
 
-private val LightColorScheme = lightColorScheme(
+private val LightColorScheme = lightColorScheme( // lightColorScheme은 MaterialTheme의 colorScheme를 설정하는 함수
     primary = Purple40,
     secondary = PurpleGrey40,
     tertiary = Pink40,
-            surface = Color(0xFFFFFBFE),
+    surface = veryLightGrey
     /* Other default colors to override
     background = Color(0xFFFFFBFE),
 
@@ -42,7 +43,7 @@ private val LightColorScheme = lightColorScheme(
 fun MyTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false, // 이거 false 해야 커스텀 가능
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
@@ -66,6 +67,6 @@ fun MyTheme(
     MaterialTheme(
         colorScheme = colorScheme,
         typography = Typography,
-        content = content
+        content = content // MyTheme의 content로 전달된 Mainscreen이 MaterialTheme의 content로 전달됨
     )
 }

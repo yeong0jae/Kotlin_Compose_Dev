@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -28,7 +29,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.kotlin_compose_dev.ui.theme.MyTheme
-import androidx.compose.runtime.CompositionLocalProvider
+import com.example.kotlin_compose_dev.ui.theme.lightGreen
 
 
 class MainActivity : ComponentActivity() {
@@ -44,9 +45,8 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun MainScreen() {
-    Surface(
+    Surface( // Surface의 color 기본값은 color: Color = MaterialTheme.colorScheme.surface로 들어감
         modifier = Modifier.fillMaxSize(),
-        color = Color.LightGray
     ) {
         ProfileCard()
     }
@@ -54,12 +54,15 @@ fun MainScreen() {
 
 @Composable
 fun ProfileCard() {
-    Card(
+    Card( // Card의 color 기본값은 CardDefaults.cardColors()로 들어감
         modifier = Modifier // Card의 modifier는 Surface를 기준으로 조정되는 값들
             .padding(16.dp)
             .fillMaxWidth()
             .wrapContentHeight(align = Alignment.Top),
-        elevation = CardDefaults.cardElevation(defaultElevation = 5.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 5.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color.White,
+        )
     ) {
         Row (
             modifier = Modifier.fillMaxWidth(),
@@ -76,7 +79,9 @@ fun ProfileCard() {
 fun ProfilePicture() {
     Card( // Card는 다양한 shape 지원 -> Image를 감쌈
         shape = CircleShape,
-        border = BorderStroke(width = 2.dp, color = Color.Green),
+        border = BorderStroke(
+            width = 2.dp,
+            color = MaterialTheme.colorScheme.lightGreen),
         modifier = Modifier.padding(16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
