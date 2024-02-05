@@ -20,7 +20,8 @@ private val DarkColorScheme = darkColorScheme( // darkColorScheme은 MaterialThe
     primary = Purple80,
     secondary = PurpleGrey80,
     tertiary = Pink80,
-    surface = veryLightGrey // surface의 color 재정의
+    surface = veryLightGrey, // surface의 color 재정의
+
 )
 
 private val LightColorScheme = lightColorScheme( // lightColorScheme은 MaterialTheme의 colorScheme를 설정하는 함수

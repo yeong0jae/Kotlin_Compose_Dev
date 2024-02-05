@@ -1,5 +1,7 @@
 package com.example.kotlin_compose_dev
 
+import android.annotation.SuppressLint
+import android.graphics.drawable.Icon
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -9,16 +11,23 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.Alignment
@@ -30,6 +39,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.kotlin_compose_dev.ui.theme.MyTheme
 import com.example.kotlin_compose_dev.ui.theme.lightGreen
+import com.example.kotlin_compose_dev.ui.theme.teal
 
 
 class MainActivity : ComponentActivity() {
@@ -43,13 +53,38 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun MainScreen() {
-    Surface( // Surface의 color 기본값은 color: Color = MaterialTheme.colorScheme.surface로 들어감
-        modifier = Modifier.fillMaxSize(),
-    ) {
-        ProfileCard()
+    Scaffold(topBar = { AppBar() }) { // 상단바 추가 -> Scaffold의 topBar를 정의
+        Surface( // Surface의 color 기본값은 color: Color = MaterialTheme.colorScheme.surface로 들어감
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(it), // it은 Scaffold로부터 전달된 paddingValues(scaffold의 크기)
+        ) {
+            ProfileCard()
+        }
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AppBar() {
+    TopAppBar(
+        navigationIcon = {
+            Icon(
+                imageVector = Icons.Default.Home,
+                contentDescription = "Home",
+                Modifier.padding(horizontal = 12.dp)
+            )
+        },
+        title = {
+            Text("Messaging Application users")
+        },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.teal,
+        )
+    )
 }
 
 @Composable
@@ -113,7 +148,6 @@ fun ProfileContent() {
         )
     }
 }
-
 
 @Preview(showBackground = true)
 @Composable
