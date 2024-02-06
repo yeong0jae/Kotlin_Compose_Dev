@@ -22,6 +22,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -29,6 +30,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -55,14 +57,19 @@ class MainActivity : ComponentActivity() {
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun MainScreen() {
+fun MainScreen(userProfiles: List<UserProfile> = userProfileList) {
     Scaffold(topBar = { AppBar() }) { // 상단바 추가 -> Scaffold의 topBar를 정의
         Surface( // Surface의 color 기본값은 color: Color = MaterialTheme.colorScheme.surface로 들어감
             modifier = Modifier
                 .fillMaxSize()
                 .padding(it), // it은 Scaffold로부터 전달된 paddingValues(scaffold의 크기)
         ) {
-            ProfileCard()
+            Column(
+            ){
+                for (userProfile in userProfiles) {
+                    ProfileCard(userProfile)
+                }
+            }
         }
     }
 }
@@ -81,6 +88,7 @@ fun AppBar() {
         title = {
             Text(
                 text = "Messaging Application users",
+                style = MaterialTheme.typography.titleMedium
                 // TopAppBar의 세부 구현 사항인 SingleRowTopAppBar에서 style의 기본값이 titleLarge로 들어감
                 // 그래서 titlelarge를 바꾸면 topappbar의 스타일도 바뀐것
             )
@@ -92,10 +100,10 @@ fun AppBar() {
 }
 
 @Composable
-fun ProfileCard() {
+fun ProfileCard(userProfile: UserProfile) {
     Card( // Card의 color 기본값은 CardDefaults.cardColors()로 들어감
         modifier = Modifier // Card의 modifier는 Surface를 기준으로 조정되는 값들
-            .padding(16.dp)
+            .padding(top = 8.dp, bottom = 4.dp, start = 8.dp, end = 8.dp)
             .fillMaxWidth()
             .wrapContentHeight(align = Alignment.Top),
         elevation = CardDefaults.cardElevation(defaultElevation = 5.dp),
@@ -109,24 +117,26 @@ fun ProfileCard() {
             // -> Row는 Card와 크기가 같게 설정됨
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            ProfilePicture()
-            ProfileContent()
+            ProfilePicture(userProfile.drawableId, userProfile.status)
+            ProfileContent(userProfile.name, userProfile.status)
         }
     }
 }
 
 @Composable
-fun ProfilePicture() {
+fun ProfilePicture(drawableId: Int, onlineStatus: Boolean) {
     Card( // Card는 다양한 shape 지원 -> Image를 감쌈
         shape = CircleShape,
         border = BorderStroke(
             width = 2.dp,
-            color = MaterialTheme.colorScheme.lightGreen),
+            color = if(onlineStatus) MaterialTheme.colorScheme.lightGreen
+                    else Color.Red // 람다식으로 색상을 지정
+        ),
         modifier = Modifier.padding(16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Image( // Image의 필수 요소는 painter와 contentDescription
-            painter = painterResource(id = R.drawable.profile1),
+            painter = painterResource(id = drawableId),
             contentDescription = "Profile Picture",
             modifier = Modifier.size(72.dp),
             contentScale = ContentScale.Crop // 이미지가 너무 크면 잘라냄
@@ -135,19 +145,21 @@ fun ProfilePicture() {
 }
 
 @Composable
-fun ProfileContent() {
+fun ProfileContent(userName: String, onlineStatus: Boolean) {
     Column(
         modifier = Modifier
             .padding(8.dp)
             .fillMaxWidth() // width를 Row(부모)의 크기와 맞춤
     ){
         Text(
-            text = "YeongJae Kim",
+            modifier = Modifier.alpha(if(onlineStatus) 1f else 0.5f), // 람다식으로 alpha값 지정
+            text = userName,
             style = MaterialTheme.typography.titleLarge // 재정의
         )
         Text(
             modifier = Modifier.alpha(0.25f),
-            text = "Active now",
+            text = if(onlineStatus) "Active now"
+            else "Offline",
             style = MaterialTheme.typography.bodySmall
         )
     }
