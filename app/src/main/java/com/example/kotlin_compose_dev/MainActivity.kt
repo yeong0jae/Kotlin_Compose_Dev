@@ -97,7 +97,8 @@ fun ProfileCard() {
         elevation = CardDefaults.cardElevation(defaultElevation = 5.dp),
         colors = CardDefaults.cardColors(
             containerColor = Color.White,
-        )
+        ),
+        shape = MaterialTheme.shapes.medium // 재정의
     ) {
         Row (
             modifier = Modifier.fillMaxWidth(),

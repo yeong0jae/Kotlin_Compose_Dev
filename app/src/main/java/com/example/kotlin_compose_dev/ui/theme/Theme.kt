@@ -10,7 +10,6 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
@@ -68,6 +67,8 @@ fun MyTheme(
     MaterialTheme(
         colorScheme = colorScheme,
         typography = Typography,
+        // Shape도 재정의 가능
+        shapes = shapes,
         content = content // MyTheme의 content로 전달된 Mainscreen이 MaterialTheme의 content로 전달됨
     )
 }
