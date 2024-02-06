@@ -79,7 +79,11 @@ fun AppBar() {
             )
         },
         title = {
-            Text("Messaging Application users")
+            Text(
+                text = "Messaging Application users",
+                // TopAppBar의 세부 구현 사항인 SingleRowTopAppBar에서 style의 기본값이 titleLarge로 들어감
+                // 그래서 titlelarge를 바꾸면 topappbar의 스타일도 바뀐것
+            )
         },
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.teal,
@@ -136,11 +140,10 @@ fun ProfileContent() {
         modifier = Modifier
             .padding(8.dp)
             .fillMaxWidth() // width를 Row(부모)의 크기와 맞춤
-
     ){
         Text(
             text = "YeongJae Kim",
-            style = MaterialTheme.typography.titleLarge
+            style = MaterialTheme.typography.titleLarge // 재정의
         )
         Text(
             modifier = Modifier.alpha(0.25f),
