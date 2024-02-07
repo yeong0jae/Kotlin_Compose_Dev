@@ -1,7 +1,6 @@
 package com.example.kotlin_compose_dev
 
 import android.annotation.SuppressLint
-import android.graphics.drawable.Icon
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -11,10 +10,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
@@ -36,9 +35,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
+import coil.transform.CircleCropTransformation
 import com.example.kotlin_compose_dev.ui.theme.MyTheme
 import com.example.kotlin_compose_dev.ui.theme.lightGreen
 import com.example.kotlin_compose_dev.ui.theme.teal
@@ -64,10 +68,9 @@ fun MainScreen(userProfiles: List<UserProfile> = userProfileList) {
                 .fillMaxSize()
                 .padding(it), // it은 Scaffold로부터 전달된 paddingValues(scaffold의 크기)
         ) {
-            Column(
-            ){
-                for (userProfile in userProfiles) {
-                    ProfileCard(userProfile)
+            LazyColumn { // LazyColumn은 많은 아이템을 효율적으로 표시하기 위한 컴포저블
+                items(count = userProfiles.size) { index ->
+                    ProfileCard(userProfile = userProfiles[index]) // lambda에서 각 항목의 인덱스 : it으로 사용해도 됨
                 }
             }
         }
@@ -136,7 +139,7 @@ fun ProfilePicture(drawableId: Int, onlineStatus: Boolean) {
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Image( // Image의 필수 요소는 painter와 contentDescription
-            painter = painterResource(id = drawableId),
+            painter = painterResource(id = drawableId), // 문제점 : 이미지를 동기식으로 가져옴
             contentDescription = "Profile Picture",
             modifier = Modifier.size(72.dp),
             contentScale = ContentScale.Crop // 이미지가 너무 크면 잘라냄
