@@ -139,10 +139,14 @@ fun ProfilePicture(drawableId: Int, onlineStatus: Boolean) {
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Image( // Image의 필수 요소는 painter와 contentDescription
-            painter = painterResource(id = drawableId), // 문제점 : 이미지를 동기식으로 가져옴
+            painter = rememberAsyncImagePainter( // coil 라이브러리의 rememberAsyncImagePainter를 사용 -> 비동기 이미지 로딩
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(drawableId)
+                    .transformations(CircleCropTransformation()) // 이미지를 원형으로 잘라냄
+                    .build()
+            ),
             contentDescription = "Profile Picture",
             modifier = Modifier.size(72.dp),
-            contentScale = ContentScale.Crop // 이미지가 너무 크면 잘라냄
         )
     }
 }
