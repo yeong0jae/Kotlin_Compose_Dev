@@ -120,14 +120,14 @@ fun ProfileCard(userProfile: UserProfile) {
             // -> Row는 Card와 크기가 같게 설정됨
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            ProfilePicture(userProfile.drawableId, userProfile.status)
+            ProfilePicture(userProfile.pictureUrl, userProfile.status)
             ProfileContent(userProfile.name, userProfile.status)
         }
     }
 }
 
 @Composable
-fun ProfilePicture(drawableId: Int, onlineStatus: Boolean) {
+fun ProfilePicture(pictureUrl: String, onlineStatus: Boolean) {
     Card( // Card는 다양한 shape 지원 -> Image를 감쌈
         shape = CircleShape,
         border = BorderStroke(
@@ -141,7 +141,7 @@ fun ProfilePicture(drawableId: Int, onlineStatus: Boolean) {
         Image( // Image의 필수 요소는 painter와 contentDescription
             painter = rememberAsyncImagePainter( // coil 라이브러리의 rememberAsyncImagePainter를 사용 -> 비동기 이미지 로딩
                 model = ImageRequest.Builder(LocalContext.current)
-                    .data(drawableId)
+                    .data(pictureUrl)
                     .transformations(CircleCropTransformation()) // 이미지를 원형으로 잘라냄
                     .build()
             ),
