@@ -44,9 +44,11 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
@@ -54,7 +56,6 @@ import coil.transform.CircleCropTransformation
 import com.example.kotlin_compose_dev.ui.theme.MyTheme
 import com.example.kotlin_compose_dev.ui.theme.lightGreen
 import com.example.kotlin_compose_dev.ui.theme.teal
-
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -75,9 +76,17 @@ fun UsersApplication(userProfiles: List<UserProfile> = userProfileList) {
     NavHost(navController = navController, startDestination = "users_list") {
         composable("users_list") {
             UserListScreen(userProfiles, navController)
+            // UsersApplication 호출 시 UserListScreen를 렌더링
         }
-        composable("user_details") {
-            UserProfileDetailsScreen()
+        composable(
+            route = "user_details/{userId}",
+            arguments = listOf(navArgument("userId") {
+                type = NavType.IntType
+            }) // navigate시 userId를 받아들이는 argument를 추가
+        ) {navBackStackEntry -> // NavBackStackEntry는 현재 route의 정보를 가지고 있음
+            UserProfileDetailsScreen(navBackStackEntry.arguments!!.getInt("userId"))
+            // ProfileCard가 navigate를 통해 이 route의 composable을 렌더링 함
+            // 그리고 navigate할 때 userId를 전달
         }
     }
 }
@@ -94,8 +103,10 @@ fun UserListScreen(userProfiles: List<UserProfile>, navController: NavHostContro
             LazyColumn { // LazyColumn은 많은 아이템을 효율적으로 표시하기 위한 컴포저블
                 items(count = userProfiles.size) { index -> // lambda에서 각 항목의 인덱스 : it으로 사용해도 됨
                     ProfileCard(userProfile = userProfiles[index]){
-                        navController?.navigate("user_details") // ?는 null이 아닐때만 실행
+                        navController?.navigate("user_details/${userProfiles[index].id}")
+                        // ?는 null이 아닐때만 실행
                         // NavController는 Screen Composable 밑에까지 전달할 필요가 없음. 호출할 navigate만 전달
+                        // id를 전달하여 UserProfileDetailsScreen으로 이동
                     }
                 }
             }
@@ -105,7 +116,10 @@ fun UserListScreen(userProfiles: List<UserProfile>, navController: NavHostContro
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun UserProfileDetailsScreen(userProfile : UserProfile = userProfileList[0]) {
+fun UserProfileDetailsScreen(userId: Int) {
+    val userProfile = userProfileList.first { it.id == userId }
+    // first는 조건에 맞는 첫번째 요소를 반환
+    // ProfileCard에서 navigate할 때 id를 전달받고 이 값을 기반으로 UserProfileDetailsScreen를 렌더링
     Scaffold(topBar = { AppBar() }) { // 상단바 추가 -> Scaffold의 topBar를 정의
         Surface( // Surface의 color 기본값은 color: Color = MaterialTheme.colorScheme.surface로 들어감
             modifier = Modifier
@@ -225,7 +239,7 @@ fun ProfileContent(userName: String, onlineStatus: Boolean, alignment: Alignment
 @Composable
 fun UserProfileDetailsPreview() {
     MyTheme {
-        UserProfileDetailsScreen()
+        UserProfileDetailsScreen(userId = 0)
     }
 }
 
