@@ -6,6 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -38,6 +39,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
@@ -52,8 +54,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            MyTheme { // 기본 테마. 원하는 대로 커스텀 가능
-                MainScreen()
+            MyTheme {
+                UserListScreen()
             }
         }
     }
@@ -61,7 +63,7 @@ class MainActivity : ComponentActivity() {
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun MainScreen(userProfiles: List<UserProfile> = userProfileList) {
+fun UserListScreen(userProfiles: List<UserProfile> = userProfileList) {
     Scaffold(topBar = { AppBar() }) { // 상단바 추가 -> Scaffold의 topBar를 정의
         Surface( // Surface의 color 기본값은 color: Color = MaterialTheme.colorScheme.surface로 들어감
             modifier = Modifier
@@ -120,14 +122,14 @@ fun ProfileCard(userProfile: UserProfile) {
             // -> Row는 Card와 크기가 같게 설정됨
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            ProfilePicture(userProfile.pictureUrl, userProfile.status)
-            ProfileContent(userProfile.name, userProfile.status)
+            ProfilePicture(userProfile.pictureUrl, userProfile.status, 72.dp)
+            ProfileContent(userProfile.name, userProfile.status, Alignment.Start)
         }
     }
 }
 
 @Composable
-fun ProfilePicture(pictureUrl: String, onlineStatus: Boolean) {
+fun ProfilePicture(pictureUrl: String, onlineStatus: Boolean, imageSize: Dp) {
     Card( // Card는 다양한 shape 지원 -> Image를 감쌈
         shape = CircleShape,
         border = BorderStroke(
@@ -135,7 +137,7 @@ fun ProfilePicture(pictureUrl: String, onlineStatus: Boolean) {
             color = if(onlineStatus) MaterialTheme.colorScheme.lightGreen
                     else Color.Red // 람다식으로 색상을 지정
         ),
-        modifier = Modifier.padding(16.dp),
+        modifier = Modifier.padding(16.dp).size(imageSize),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Image( // Image의 필수 요소는 painter와 contentDescription
@@ -146,17 +148,16 @@ fun ProfilePicture(pictureUrl: String, onlineStatus: Boolean) {
                     .build()
             ),
             contentDescription = "Profile Picture",
-            modifier = Modifier.size(72.dp),
         )
     }
 }
 
 @Composable
-fun ProfileContent(userName: String, onlineStatus: Boolean) {
+fun ProfileContent(userName: String, onlineStatus: Boolean, alignment: Alignment.Horizontal) {
     Column(
         modifier = Modifier
-            .padding(8.dp)
-            .fillMaxWidth() // width를 Row(부모)의 크기와 맞춤
+            .padding(8.dp),
+        horizontalAlignment = alignment,
     ){
         Text(
             modifier = Modifier.alpha(if(onlineStatus) 1f else 0.5f), // 람다식으로 alpha값 지정
@@ -172,10 +173,40 @@ fun ProfileContent(userName: String, onlineStatus: Boolean) {
     }
 }
 
-@Preview(showBackground = true)
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun ContentPreview() {
-    MyTheme {
-        MainScreen()
+fun UserProfileDetailsScreen(userProfile : UserProfile = userProfileList[0]) {
+    Scaffold(topBar = { AppBar() }) { // 상단바 추가 -> Scaffold의 topBar를 정의
+        Surface( // Surface의 color 기본값은 color: Color = MaterialTheme.colorScheme.surface로 들어감
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(it), // it은 Scaffold로부터 전달된 paddingValues(scaffold의 크기)
+        ) {
+            Column (
+                modifier = Modifier.fillMaxWidth(),
+                // -> Row는 부모와 크기가 같게 설정됨
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                ProfilePicture(userProfile.pictureUrl, userProfile.status, 240.dp)
+                ProfileContent(userProfile.name, userProfile.status, Alignment.CenterHorizontally)
+            }
+        }
     }
 }
+
+@Preview(showBackground = true)
+@Composable
+fun UserProfileDetailsPreview() {
+    MyTheme {
+        UserProfileDetailsScreen()
+    }
+}
+//
+//
+//@Preview(showBackground = true)
+//@Composable
+//fun UserListPreview() {
+//    MyTheme {
+//        UserListScreen()
+//    }
+//}
