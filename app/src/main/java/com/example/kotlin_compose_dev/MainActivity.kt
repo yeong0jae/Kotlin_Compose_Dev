@@ -6,6 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -41,6 +42,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
@@ -55,15 +61,30 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             MyTheme {
-                UserListScreen()
+                UsersApplication()
             }
+        }
+    }
+}
+
+@Composable
+// Navigation을 위한 Composable
+// UserProfiles를 Hoisting
+fun UsersApplication(userProfiles: List<UserProfile> = userProfileList) {
+    val navController = rememberNavController() // NavHostController를 생성하고 기억
+    NavHost(navController = navController, startDestination = "users_list") {
+        composable("users_list") {
+            UserListScreen(userProfiles, navController)
+        }
+        composable("user_details") {
+            UserProfileDetailsScreen()
         }
     }
 }
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun UserListScreen(userProfiles: List<UserProfile> = userProfileList) {
+fun UserListScreen(userProfiles: List<UserProfile>, navController: NavHostController?) {
     Scaffold(topBar = { AppBar() }) { // 상단바 추가 -> Scaffold의 topBar를 정의
         Surface( // Surface의 color 기본값은 color: Color = MaterialTheme.colorScheme.surface로 들어감
             modifier = Modifier
@@ -71,9 +92,33 @@ fun UserListScreen(userProfiles: List<UserProfile> = userProfileList) {
                 .padding(it), // it은 Scaffold로부터 전달된 paddingValues(scaffold의 크기)
         ) {
             LazyColumn { // LazyColumn은 많은 아이템을 효율적으로 표시하기 위한 컴포저블
-                items(count = userProfiles.size) { index ->
-                    ProfileCard(userProfile = userProfiles[index]) // lambda에서 각 항목의 인덱스 : it으로 사용해도 됨
+                items(count = userProfiles.size) { index -> // lambda에서 각 항목의 인덱스 : it으로 사용해도 됨
+                    ProfileCard(userProfile = userProfiles[index]){
+                        navController?.navigate("user_details") // ?는 null이 아닐때만 실행
+                        // NavController는 Screen Composable 밑에까지 전달할 필요가 없음. 호출할 navigate만 전달
+                    }
                 }
+            }
+        }
+    }
+}
+
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@Composable
+fun UserProfileDetailsScreen(userProfile : UserProfile = userProfileList[0]) {
+    Scaffold(topBar = { AppBar() }) { // 상단바 추가 -> Scaffold의 topBar를 정의
+        Surface( // Surface의 color 기본값은 color: Color = MaterialTheme.colorScheme.surface로 들어감
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(it), // it은 Scaffold로부터 전달된 paddingValues(scaffold의 크기)
+        ) {
+            Column (
+                modifier = Modifier.fillMaxWidth(),
+                // -> Row는 부모와 크기가 같게 설정됨
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                ProfilePicture(userProfile.pictureUrl, userProfile.status, 240.dp)
+                ProfileContent(userProfile.name, userProfile.status, Alignment.CenterHorizontally)
             }
         }
     }
@@ -105,12 +150,13 @@ fun AppBar() {
 }
 
 @Composable
-fun ProfileCard(userProfile: UserProfile) {
+fun ProfileCard(userProfile: UserProfile, clickAction: () -> Unit) {
     Card( // Card의 color 기본값은 CardDefaults.cardColors()로 들어감
         modifier = Modifier // Card의 modifier는 Surface를 기준으로 조정되는 값들
             .padding(top = 8.dp, bottom = 4.dp, start = 8.dp, end = 8.dp)
             .fillMaxWidth()
-            .wrapContentHeight(align = Alignment.Top),
+            .wrapContentHeight(align = Alignment.Top)
+            .clickable(onClick = { clickAction.invoke() }), // invoke()는 람다식을 호출하는 함수
         elevation = CardDefaults.cardElevation(defaultElevation = 5.dp),
         colors = CardDefaults.cardColors(
             containerColor = Color.White,
@@ -173,26 +219,7 @@ fun ProfileContent(userName: String, onlineStatus: Boolean, alignment: Alignment
     }
 }
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-@Composable
-fun UserProfileDetailsScreen(userProfile : UserProfile = userProfileList[0]) {
-    Scaffold(topBar = { AppBar() }) { // 상단바 추가 -> Scaffold의 topBar를 정의
-        Surface( // Surface의 color 기본값은 color: Color = MaterialTheme.colorScheme.surface로 들어감
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(it), // it은 Scaffold로부터 전달된 paddingValues(scaffold의 크기)
-        ) {
-            Column (
-                modifier = Modifier.fillMaxWidth(),
-                // -> Row는 부모와 크기가 같게 설정됨
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                ProfilePicture(userProfile.pictureUrl, userProfile.status, 240.dp)
-                ProfileContent(userProfile.name, userProfile.status, Alignment.CenterHorizontally)
-            }
-        }
-    }
-}
+
 
 @Preview(showBackground = true)
 @Composable
@@ -201,12 +228,12 @@ fun UserProfileDetailsPreview() {
         UserProfileDetailsScreen()
     }
 }
-//
-//
-//@Preview(showBackground = true)
-//@Composable
-//fun UserListPreview() {
-//    MyTheme {
-//        UserListScreen()
-//    }
-//}
+
+
+@Preview(showBackground = true)
+@Composable
+fun UserListPreview() {
+    MyTheme {
+        UserListScreen(userProfiles = userProfileList, null)
+    }
+}
