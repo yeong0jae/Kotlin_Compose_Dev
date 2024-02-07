@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -36,6 +37,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -84,7 +86,7 @@ fun UsersApplication(userProfiles: List<UserProfile> = userProfileList) {
                 type = NavType.IntType
             }) // navigate시 userId를 받아들이는 argument를 추가
         ) {navBackStackEntry -> // NavBackStackEntry는 현재 route의 정보를 가지고 있음
-            UserProfileDetailsScreen(navBackStackEntry.arguments!!.getInt("userId"))
+            UserProfileDetailsScreen(navBackStackEntry.arguments!!.getInt("userId"), navController)
             // ProfileCard가 navigate를 통해 이 route의 composable을 렌더링 함
             // 그리고 navigate할 때 userId를 전달
         }
@@ -94,7 +96,12 @@ fun UsersApplication(userProfiles: List<UserProfile> = userProfileList) {
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun UserListScreen(userProfiles: List<UserProfile>, navController: NavHostController?) {
-    Scaffold(topBar = { AppBar() }) { // 상단바 추가 -> Scaffold의 topBar를 정의
+    Scaffold(topBar = {
+        AppBar(
+            title = "Users list",
+            icon = Icons.Default.Home,
+        ) {  } // no action
+    }) { // 상단바 추가 -> Scaffold의 topBar를 정의
         Surface( // Surface의 color 기본값은 color: Color = MaterialTheme.colorScheme.surface로 들어감
             modifier = Modifier
                 .fillMaxSize()
@@ -116,11 +123,20 @@ fun UserListScreen(userProfiles: List<UserProfile>, navController: NavHostContro
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun UserProfileDetailsScreen(userId: Int) {
+fun UserProfileDetailsScreen(userId: Int, navController: NavHostController?) {
     val userProfile = userProfileList.first { it.id == userId }
     // first는 조건에 맞는 첫번째 요소를 반환
     // ProfileCard에서 navigate할 때 id를 전달받고 이 값을 기반으로 UserProfileDetailsScreen를 렌더링
-    Scaffold(topBar = { AppBar() }) { // 상단바 추가 -> Scaffold의 topBar를 정의
+    Scaffold(topBar = {
+        AppBar(
+            title = "User profile details",
+            icon = Icons.Default.ArrowBack,
+        ) {
+            navController?.navigateUp()
+            // 가장 최근 composable을 pop하고 이전 composable으로 이동
+        }
+    }){
+        // 상단바 추가 -> Scaffold의 topBar를 정의
         Surface( // Surface의 color 기본값은 color: Color = MaterialTheme.colorScheme.surface로 들어감
             modifier = Modifier
                 .fillMaxSize()
@@ -140,18 +156,19 @@ fun UserProfileDetailsScreen(userId: Int) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AppBar() {
+fun AppBar(title: String, icon: ImageVector, iconClickAction: () -> Unit) {
     TopAppBar(
         navigationIcon = {
             Icon(
-                imageVector = Icons.Default.Home,
+                imageVector = icon,
                 contentDescription = "Home",
-                Modifier.padding(horizontal = 12.dp)
+                modifier = Modifier.padding(horizontal = 12.dp)
+                    .clickable { iconClickAction.invoke() }
             )
         },
         title = {
             Text(
-                text = "Messaging Application users",
+                text = title,
                 style = MaterialTheme.typography.titleMedium
                 // TopAppBar의 세부 구현 사항인 SingleRowTopAppBar에서 style의 기본값이 titleLarge로 들어감
                 // 그래서 titlelarge를 바꾸면 topappbar의 스타일도 바뀐것
@@ -239,7 +256,7 @@ fun ProfileContent(userName: String, onlineStatus: Boolean, alignment: Alignment
 @Composable
 fun UserProfileDetailsPreview() {
     MyTheme {
-        UserProfileDetailsScreen(userId = 0)
+        UserProfileDetailsScreen(userId = 0, null)
     }
 }
 
